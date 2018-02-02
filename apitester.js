@@ -1,4 +1,3 @@
-
 const configs = require('./configs/bootload');
 const ReplAI = require('./repl-ai');
 const replAi = new ReplAI(configs.repl_ai.x_api_key, configs.repl_ai.bot_id, configs.repl_ai.init_topic_id);

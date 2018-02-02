@@ -15,13 +15,13 @@ console.log("Loading DB");
 db.loadDatabase((err) => {
     if (err) throw err;
     console.log("Finished Loading DB. Start Sorting...");
-    db.find({}).sort({ dialogueCreated: 1 }).exec((err, docs) => {
+    db.find({}).sort({ dialogue_created: 1 }).exec((err, docs) => {
         if (err) throw err;
         let output = "";
         if (mode==="debug") console.log(docs);
         Object.keys(docs).forEach((key) => {
             const doc = docs[key];
-            output = output.concat(dateFormat(doc.dialogueCreated, "yyyy-mm-dd HH:MM:ss") + "\t" + doc.discordId + "\t" + doc.requestMessage + "\t" + doc.responseMessage + "\n");
+            output = output.concat(dateFormat(doc.dialogue_created, "yyyy-mm-dd HH:MM:ss") + "\t" + doc.discord_id + "\t" + doc.request_message + "\t" + doc.response_message + "\n");
         });
         if (mode==="debug") console.log(output);
         console.log("Outputting");
