@@ -1,0 +1,32 @@
+{
+	"bot": {
+		  "id": "405341835758665740"
+		, "token": "NDA1MzQxODM1NzU4NjY1NzQw.DUtUcg.tLoi-K5BFHsQMFex_KWU9UtAGZw"
+        , "logout_sigint": false
+        , "mode": {
+              "debug": true
+            , "info" : true
+        }
+        , "use_old": false
+	},
+	"repl_ai": {
+		  "x_api_key": "J1EfsB9K0u3gKIvUzoT5g3DIYqK4hmLV1Wt05DOl"
+		, "bot_id": "b4gwm22uh92g40z"
+		, "url": {
+			  "registration": "https://api.repl-ai.jp/v1/registration"
+			, "dialogue": "https://api.repl-ai.jp/v1/dialogue"
+		}
+		, "init_topic_id": "s4gwm7jjzlbmse5"
+		, "db": {
+			  "user_info": {
+                "path": "db/repl-ai/repl-ai.db"
+            }
+            , "dialogue_log": {
+                "path": "db/repl-ai/log.db"
+            }
+		}
+	},
+    "docomo_api": {
+          "api_key": "74317068703270423778784c6234424f3173614454476d766848726d5341357a4953666b72524962506232"
+    }
+}
