@@ -16,7 +16,7 @@
 			  "registration": "https://api.repl-ai.jp/v1/registration"
 			, "dialogue": "https://api.repl-ai.jp/v1/dialogue"
 		}
-		, "init_topic_id": "s4gwm7jjzlbmse5"
+		, "root_topic_id": "s4gwm7jjzlbmse5"
 		, "db": {
 			  "user_info": {
                 "path": "db/repl-ai/repl-ai.db"

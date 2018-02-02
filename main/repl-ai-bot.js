@@ -1,7 +1,11 @@
 const configs = require('../configs/bootload');
 const mm = require('../lib/message-manager');
-const ReplAI = require('../repl-ai');
-const replAi = new ReplAI(configs.repl_ai.x_api_key, configs.repl_ai.bot_id, configs.repl_ai.init_topic_id);
+const ReplAI = require('repl-ai');
+const replAiOptions = {
+      x_api_key: configs.repl_ai.x_api_key
+    , botId: configs.repl_ai.bot_id
+};
+const replAi = new ReplAI(replAiOptions);
 const Datastore = require('nedb');
 const c = require('../lib/console');
 const dateFormat = require("dateformat");
@@ -19,6 +23,7 @@ function start_repl_ai(client) {
         const replyeeId = message.author.id;
         let isInit = false;
         let response = {}; // createDialogueにて返却されたデータ
+        let lastTalkedAt;
 
         if (!mm.isSentTo(configs.bot.id, message)) return;
         const text = message.content.match(/(.*\d>|@everyone|@here)\s*(.*)$/)[2];
@@ -28,7 +33,7 @@ function start_repl_ai(client) {
                 db.loadDatabase(callback);
             },
             function(callback) {
-                db.findOne({id: replyeeId}, callback);
+                db.findOne({discord_id: replyeeId}, callback);
             },
             function(doc, callback) {
                 c.info("知り合い？");
@@ -36,12 +41,14 @@ function start_repl_ai(client) {
                 if (!doc) {
                     c.info("知らない人");
                     isInit = true;
+                    lastTalkedAt = dateFormat(new Date(), "yyyy-mm-dd HH:MM:ss");
                     replAi.register(callback);
 
                 } else {
                     c.info("知ってた");
                     isInit = false;
                     const data = {isInit: false, appUserId: doc.app_user_id};
+                    lastTalkedAt = dateFormat(doc.last_talked_at, "yyyy-mm-dd HH:MM:ss");
                     callback(null, data);
                 }
             },
@@ -50,19 +57,26 @@ function start_repl_ai(client) {
                     c.info("覚えた");
                     db.insert(mm.initInsertDoc(replyeeId, data.appUserId), callback);
                 } else {
+                    console.log(data);
+                    console.log("lastTalkedAt", lastTalkedAt);
                     callback(null, {app_user_id: data.appUserId});
                 }
             },
             function (doc, callback) {
                 c.debug("こう聞かれた");
                 c.debug(":> " + text);
-                const lastTalkedAt = dateFormat(doc.last_talked_at, "yyyy-mm-dd HH:MM:ss");
-                replAi.createDialogue(doc.app_user_id, isInit, text, lastTalkedAt, callback);
+                const replOptions = {
+                      appUserId: doc.app_user_id
+                    , voiceText: text
+                    , initTopicId: configs.repl_ai.root_topic_id
+                    , appRecvTime: lastTalkedAt
+                };
+                replAi.createDialogue(replOptions, callback);
             },
             function(data, callback) {
                 response = data;
                 c.info("最後の会話日時を記憶する");
-                db.update({id: replyeeId}, {$set: {last_talked_at: new Date()}}, {}, callback)
+                db.update({discord_id: replyeeId}, {$set: {last_talked_at: new Date()}}, {}, callback)
                 dm.outputDialogueLog(replyeeId, text, response.systemText.expression);
             },
             function () {
