@@ -25,7 +25,7 @@ db.loadDatabase((err) => {
         });
         if (mode==="debug") console.log(output);
         console.log("Outputting");
-        writeFile('test.tsv', output);
+        writeFile('output/dialogue_log.tsv', output);
         console.log("Finished");
     });
 });

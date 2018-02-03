@@ -5,3 +5,5 @@ node_modules*
 aaa.js
 configs/order-help.txt
 configs/configs.json
+output/*
+!output/.gitignore
