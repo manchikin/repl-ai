@@ -23,8 +23,9 @@ class OrderExecutor
         this.channelProcess = new ChannelProcess(this);
     }
 
-    startUp(text)
+    startUp(text, client)
     {
+        this.client = client;
         c.info("命令受付");
         const escaped_prefix = configs.bot.force_prefix.replace(/([.*+?^=!:${}()|[\]\/\\])/g, "\\$1");
         const reg = new RegExp(`^\\s*<@${configs.bot.id}>\\s*${escaped_prefix}(.*)$`);

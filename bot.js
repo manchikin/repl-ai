@@ -33,7 +33,7 @@ client.on("message", (message) => {
             c.info("メッセージ受付");
             if (mm.isOrder(message.content)) {
                 const orderExecutor = new OE(message);
-                orderExecutor.startUp(message.content);
+                orderExecutor.startUp(message.content, client);
                 return;
             };
             c.info('受付中チャンネル？')
