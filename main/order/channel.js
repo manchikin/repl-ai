@@ -74,12 +74,13 @@ class ChannelProcess
             let messageText = configs.order.messages.channel.show + "\n```";
             this.db.find({table: 'channels'}, (err, channels) => {
                 if (err) throw err;
-                const channelIds = channels[0].availables;
-                c.debug("受付中チャンネル：" + channelIds);
+                const channelIds = Object.keys(channels).length !== 0 ? channels[0].availables : false;
                 if (!channelIds || Object.keys(channelIds).length === 0) {
+                    c.debug("受付中チャンネルなし");
                     this.executor.send(mm.replyeeString(this.executor.replyeeId) + " " + configs.order.messages.channel.none);
                     return;
                 }
+                c.debug("受付中チャンネル：" + channelIds);
                 channelIds.sort();
                 messageText += "ID                  , name\n"
                 Object.keys(channelIds).forEach((key) => {
