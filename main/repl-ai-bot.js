@@ -23,6 +23,7 @@ function start_repl_ai(message) {
     let isInit = false;
     let response = {}; // createDialogueにて返却されたデータ
     let lastTalkedAt;
+    let talkTimeNumber = 0;
 
     const text = message.content.match(/(.*\d>|@everyone|@here)\s*(.*)$/)[2];
 
@@ -45,6 +46,7 @@ function start_repl_ai(message) {
             } else {
                 c.info("知ってた");
                 isInit = false;
+                talkTimeNumber = doc.talk_time_number;
                 const data = {isInit: false, appUserId: doc.app_user_id};
                 lastTalkedAt = dateFormat(doc.last_talked_at, "yyyy-mm-dd HH:MM:ss");
                 callback(null, data);
@@ -55,8 +57,6 @@ function start_repl_ai(message) {
                 c.info("覚えた");
                 db.insert(mm.initInsertDoc(replyeeId, data.appUserId), callback);
             } else {
-                console.log(data);
-                console.log("lastTalkedAt", lastTalkedAt);
                 callback(null, {app_user_id: data.appUserId});
             }
         },
@@ -74,7 +74,7 @@ function start_repl_ai(message) {
         function(data, callback) {
             response = data;
             c.info("最後の会話日時を記憶する");
-            db.update({discord_id: replyeeId}, {$set: {last_talked_at: new Date()}}, {}, callback)
+            db.update({discord_id: replyeeId}, {$set: {last_talked_at: new Date(), talk_time_number: talkTimeNumber + 1}}, {}, callback)
             dm.outputDialogueLog(replyeeId, text, response.systemText.expression);
         },
         function () {
