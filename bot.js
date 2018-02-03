@@ -40,8 +40,8 @@ client.on("message", (message) => {
             mm.isFromAvailableChannel(message.channel.id, callback)
         },
         (isFromAvailableChannel, callback) => {
-            c.info("受付中チャンネルIDであることを確認");
             if (!isFromAvailableChannel) return;
+            c.info("受付中チャンネルIDであることを確認");
             if (configs.bot.use_old) docomoApiBot.startUp(message);
             if (!configs.bot.use_old) replAiBot.startUp(message);
         }
