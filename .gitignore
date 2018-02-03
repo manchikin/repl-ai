@@ -3,3 +3,4 @@ node_modules*
 *.tsv
 *.db
 aaa.js
+configs/order-help.txt

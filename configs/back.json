@@ -18,7 +18,7 @@
 		}
 		, "init_topic_id": "s4gwm7jjzlbmse5"
 		, "db": {
-			  "user_info": {
+			  "main": {
                 "path": "db/repl-ai/repl-ai.db"
             }
             , "dialogue_log": {
