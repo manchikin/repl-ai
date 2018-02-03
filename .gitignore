@@ -4,3 +4,4 @@ node_modules*
 *.db
 aaa.js
 configs/order-help.txt
+configs/configs.json
