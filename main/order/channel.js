@@ -16,19 +16,22 @@ class ChannelProcess
     {
         switch(type) {
             case '+':
-            if (!target) {
-                this.executor.showHelp(); return;
-            };
-            this.addChannel(target);
-            break;
+                c.info("チャンネル追加");
+                if (!target) {
+                    this.executor.showHelp(); return;
+                };
+                this.addChannel(target);
+                break;
             case '-':
-            if (!target) {
-                this.executor.showHelp(); return;
-            }
-            this.removeChannel(target);
-            break;
+                c.info("チャンネル削除");
+                if (!target) {
+                    this.executor.showHelp(); return;
+                }
+                this.removeChannel(target);
+                break;
             default:
-            this.showChannel();
+                c.info("チャンネル一覧表示");
+                this.showChannel();
         }
     }
 
@@ -38,6 +41,7 @@ class ChannelProcess
             if (err) throw err;
             this.db.update({table: 'channels'}, {$addToSet: { availables: target}}, {upsert: true}, (err) => {
                 if (err) throw err;
+                c.debug("追加対象チャンネルID：", target);
                 const messageText = configs.order.messages.channel.add.replace("###ID###", target);
                 this.executor.send(mm.replyeeString(this.executor.replyeeId) + " " + messageText);
             });
@@ -50,7 +54,7 @@ class ChannelProcess
             if (err) throw err;
             this.db.update({table: 'channels'}, { $pull: {availables: {$in: [target]}}}, {}, (err) => {
                 if (err) throw err;
-                console.log(target);
+                c.debug("削除対象チャンネルID：", target);
                 const messageText = configs.order.messages.channel.remove.replace("###ID###", target);
                 this.executor.send(mm.replyeeString(this.executor.replyeeId) + " " + messageText);
             });
@@ -66,7 +70,7 @@ class ChannelProcess
             this.db.find({table: 'channels'}, (err, channels) => {
                 if (err) throw err;
                 const docs = channels[0].availables;
-                console.log(docs);
+                c.debug("受付中チャンネル：" + docs);
                 if (!docs || Object.keys(docs).length === 0) {
                     this.executor.send(mm.replyeeString(this.executor.replyeeId) + " " + configs.order.messages.channel.none);
                     return;
@@ -76,7 +80,7 @@ class ChannelProcess
                     messageText = messageText + " " + doc+ "\n";
                 });
                 messageText = messageText + "```";
-                console.log(messageText);
+                c.debug("表示予定テキスト：\n" + messageText);
                 this.executor.send(mm.replyeeString(this.executor.replyeeId) + " " + messageText);
             });
         });

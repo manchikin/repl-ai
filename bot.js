@@ -30,14 +30,17 @@ client.on("message", (message) => {
     async.waterfall([
         (callback) => {
             if (!mm.isSentTo(configs.bot.id, message)) return;
+            c.info("メッセージ受付");
             if (mm.isOrder(message.content)) {
                 const orderExecutor = new OE(message);
                 orderExecutor.startUp(message.content);
                 return;
             };
+            c.info('受付中チャンネル？')
             mm.isFromAvailableChannel(message.channel.id, callback)
         },
         (isFromAvailableChannel, callback) => {
+            c.info("受付中チャンネルIDであることを確認");
             if (!isFromAvailableChannel) return;
             if (configs.bot.use_old) docomoApiBot.startUp(message);
             if (!configs.bot.use_old) replAiBot.startUp(message);

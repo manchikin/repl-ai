@@ -25,19 +25,24 @@ class OrderExecutor
 
     startUp(text)
     {
+        c.info("命令受付");
         const escaped_prefix = configs.bot.force_prefix.replace(/([.*+?^=!:${}()|[\]\/\\])/g, "\\$1");
         const reg = new RegExp(`^\\s*<@${configs.bot.id}>\\s*${escaped_prefix}(.*)$`);
         const order = text.match(reg)[1].trim();
-        console.log("order:", order);
+        c.debug(order);
+        c.info("命令解析");
+        c.debug("命令:"+ order);
         const [, command, type, target]  = order.match(/^(help|channel)?\s*(\+|-)?\s*(.*)?/i);
-        console.log("command:", command);
-        console.log("type:", type);
-        console.log("target:", target);
+        c.debug("command:" + command);
+        c.debug("type:" + type);
+        c.debug("target:" + target);
         if (!command || command.toLowerCase() == "help") {
+            c.info("ヘルプ表示命令");
             this.showHelp(); return;
         }
         switch (command.toLowerCase()) {
             case "channel":
+                c.info("チャンネル操作命令");
                 this.channelProcess.execute(type, target);
                 break;
             default:
@@ -49,7 +54,7 @@ class OrderExecutor
 
     showHelp()
     {
-        console.log("showHelp");
+        c.info("ヘルプ表示実行");
         const helpMessage = fs.readFileSync('configs/order-help.txt', 'utf8');
         this.send("```" + helpMessage + "```");
     }
