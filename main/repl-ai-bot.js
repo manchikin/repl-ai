@@ -15,6 +15,7 @@ const dm = new DialogueManager();
 const db = new Datastore({
     filename: configs.repl_ai.db.main.path
 });
+const AffixManager = require('../lib/repl-ai/affix-manager');
 
 const async = require("async");
 
@@ -24,6 +25,7 @@ function start_repl_ai(message) {
     let response = {}; // createDialogueにて返却されたデータ
     let lastTalkedAt;
     let talkTimeNumber = 0;
+    let am; //AffixManager
 
     const text = message.content.match(/(.*\d>|@everyone|@here)\s*(.*)$/)[2];
 
@@ -47,7 +49,7 @@ function start_repl_ai(message) {
                 c.info("知ってた");
                 isInit = false;
                 talkTimeNumber = doc.talk_time_number;
-                const data = {isInit: false, appUserId: doc.app_user_id};
+                const data = Object.assign({isInit: false}, doc);
                 lastTalkedAt = dateFormat(doc.last_talked_at, "yyyy-mm-dd HH:MM:ss");
                 callback(null, data);
             }
@@ -57,30 +59,47 @@ function start_repl_ai(message) {
                 c.info("覚えた");
                 db.insert(mm.initInsertDoc(replyeeId, data.appUserId), callback);
             } else {
-                callback(null, {app_user_id: data.appUserId});
+                callback(null, data);
             }
         },
         function (doc, callback) {
             c.debug("こう聞かれた");
             c.debug(":> " + text);
+            c.info("prefix反映作業開始");
+            am = new AffixManager(doc);
+            const prefix = am.getPrefix();
+            c.debug("prefix追加判定後文字列");
+            c.debug(":> " + prefix + text);
             const replOptions = {
                 appUserId: doc.app_user_id
-                , voiceText: text
+                , voiceText: prefix + text
                 , initTopicId: configs.repl_ai.root_topic_id
                 , appRecvTime: lastTalkedAt
             };
+
+            c.info("ダイアログ実行");
             replAi.createDialogue(replOptions, callback);
         },
         function(data, callback) {
             response = data;
+            c.info('suffix取得処理')
+            const suffix = am.getSuffixDataOf(response.systemText.expression);
+            c.debug("suffix:");
+            c.debug(suffix);
             c.info("最後の会話日時を記憶する");
-            db.update({discord_id: replyeeId}, {$set: {last_talked_at: new Date(), talk_time_number: talkTimeNumber + 1}}, {}, callback)
-            dm.outputDialogueLog(replyeeId, text, response.systemText.expression);
+            db.update({discord_id: replyeeId},
+                 {$set: {last_talked_at: new Date()
+                       , talk_time_number: talkTimeNumber + 1
+                       , last_suffix_data: suffix.suffixString
+                       , favorability: suffix.updateFavorability
+                   }}, {}, callback)
+            response.responseMessage = suffix.responseText;
+            dm.outputDialogueLog(replyeeId, text, suffix.responseText, suffix.string, suffix.updateFavorability);
         },
         function () {
             c.info("返答する");
-            c.debug(response);
-            message.channel.send(mm.replyeeString(replyeeId) + " " + response.systemText.expression);
+            c.debug(response.responseMessage);
+            message.channel.send(mm.replyeeString(replyeeId) + " " + response.responseMessage);
         }
     ],
     function(err, result){

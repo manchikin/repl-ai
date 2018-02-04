@@ -7,7 +7,7 @@
               "debug": true
             , "info" : true
         }
-        , "use_old": true
+        , "use_old": false
         , "force_prefix": "!"
 	},
     "order": {
@@ -23,13 +23,13 @@
         }
     },
 	"repl_ai": {
-		  "x_api_key": "J1EfsB9K0u3gKIvUzoT5g3DIYqK4hmLV1Wt05DOl"
-		, "bot_id": "b4gwm22uh92g40z"
+		  "x_api_key": "urbpqf6KpD2akuOL1niTy531GGkHivBs4D5mHvfb"
+		, "bot_id": "sample"
 		, "url": {
 			  "registration": "https://api.repl-ai.jp/v1/registration"
 			, "dialogue": "https://api.repl-ai.jp/v1/dialogue"
 		}
-		, "root_topic_id": "s4gwm7jjzlbmse5"
+		, "root_topic_id": "aisatsu"
 		, "db": {
 			  "main": {
                 "path": "db/repl-ai/repl-ai.db"
@@ -38,6 +38,9 @@
                 "path": "db/repl-ai/log.db"
             }
 		}
+        , "status": {
+            "first_favorability": 20
+        }
 	},
     "docomo_api": {
           "api_key": "74317068703270423778784c6234424f3173614454476d766848726d5341357a4953666b72524962506232"
