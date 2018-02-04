@@ -26,6 +26,12 @@ async.series([
 
 });
 
+client.on("guildMemberAdd", (member) => {
+    c.info("ギルドメンバー追加");
+    console.log(member);
+    client.channels.find('id', configs.main.welcome.channel_id).send(mm.replyeeString(member.id) + "\n" + configs.main.welcome.message);
+});
+
 client.on("message", (message) => {
     async.waterfall([
         (callback) => {
