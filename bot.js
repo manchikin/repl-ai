@@ -19,6 +19,8 @@ async.series([
     },
     function (callback) {
         c.info("ログインしました");
+        c.info("ログイン時メッセージ表示");
+        client.channels.find('id', configs.main.channel_info.login.channel_id).send(mm.getLoginMessage());
     }
 
 ], function(err, results) {
@@ -29,7 +31,7 @@ async.series([
 client.on("guildMemberAdd", (member) => {
     c.info("ギルドメンバー追加");
     console.log(member);
-    client.channels.find('id', configs.main.welcome.channel_id).send(mm.replyeeString(member.id) + "\n" + configs.main.welcome.message);
+    client.channels.find('id', configs.main.channel_info.welcome.channel_id).send(mm.replyeeString(member.id) + "\n" + configs.main.message.welcome);
 });
 
 client.on("message", (message) => {
