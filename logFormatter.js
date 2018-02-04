@@ -17,7 +17,7 @@ db.loadDatabase((err) => {
     console.log("Finished Loading DB. Start Sorting...");
     db.find({}).sort({ dialogue_created: 1 }).exec((err, docs) => {
         if (err) throw err;
-        let output = "";
+        let output = "日時\tdiscord id\tリクエスト\tレスポンス\n";
         if (mode==="debug") console.log(docs);
         Object.keys(docs).forEach((key) => {
             const doc = docs[key];
