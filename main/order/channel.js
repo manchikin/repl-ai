@@ -16,30 +16,30 @@ class ChannelProcess
     {
         switch(type) {
             case '+':
-                c.info("チャンネル追加");
+                c.log("チャンネル追加", "info");
                 if (!target) {
                     this.executor.showHelp(); return;
                 };
                 this.addChannel(target);
                 break;
             case '-':
-                c.info("チャンネル削除");
+                c.log("チャンネル削除", "info");
                 if (!target) {
                     this.executor.showHelp(); return;
                 }
                 this.removeChannel(target);
                 break;
             default:
-                c.info("チャンネル一覧表示");
+                c.log("チャンネル一覧表示", "info");
                 this.showChannel();
         }
     }
 
     addChannel(target)
     {
-        c.debug("追加対象チャンネルID：", target);
+        c.log("追加対象チャンネルID：", target, "debug");
         if (!this.executor.client.channels.find('id', target)) {
-            c.info("対象チャンネルがBOTのアクセス可能なチャンネルに存在しません");
+            c.log("対象チャンネルがBOTのアクセス可能なチャンネルに存在しません", "info");
             this.executor.send(mm.replyeeString(this.executor.replyeeId) + " " + this._replaceMessage(configs.order.messages.channel.reject, target));
             return;
         };
@@ -59,7 +59,7 @@ class ChannelProcess
             if (err) throw err;
             this.db.update({table: 'channels'}, { $pull: {availables: {$in: [target]}}}, {}, (err) => {
                 if (err) throw err;
-                c.debug("削除対象チャンネルID：", target);
+                c.log("削除対象チャンネルID：", target, "debug");
                 const messageText = this._replaceMessage(configs.order.messages.channel.remove, target);
                 this.executor.send(mm.replyeeString(this.executor.replyeeId) + " " + messageText);
             });
@@ -76,23 +76,23 @@ class ChannelProcess
                 if (err) throw err;
                 const channelIds = Object.keys(channels).length !== 0 ? channels[0].availables : false;
                 if (!channelIds || Object.keys(channelIds).length === 0) {
-                    c.debug("受付中チャンネルなし");
+                    c.log("受付中チャンネルなし", "debug");
                     this.executor.send(mm.replyeeString(this.executor.replyeeId) + " " + configs.order.messages.channel.none);
                     return;
                 }
-                c.debug("受付中チャンネル：" + channelIds);
+                c.log("受付中チャンネル：" + channelIds, "debug");
                 channelIds.sort();
                 messageText += "ID                  , name\n"
                 Object.keys(channelIds).forEach((key) => {
                     const id = channelIds[key];
                     const paddedId = (id + '                    ').slice(0, 20);
-                    c.debug("チャンネルID" + id);
+                    c.log("チャンネルID" + id, "debug");
                     const name = this._getChannelName(this.executor.client.channels.find('id', id) || false);
-                    c.debug("チャンネル名：" + name);
+                    c.log("チャンネル名：" + name, "debug");
                     messageText += `${paddedId}, ${name}\n`;
                 });
                 messageText = messageText + "```";
-                c.debug("表示予定テキスト：\n" + messageText);
+                c.log("表示予定テキスト：\n" + messageText, "debug");
                 this.executor.send(mm.replyeeString(this.executor.replyeeId) + " " + messageText);
             });
         });

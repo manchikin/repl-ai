@@ -26,24 +26,24 @@ class OrderExecutor
     startUp(text, client)
     {
         this.client = client;
-        c.info("命令受付");
+        c.log("命令受付", "info");
         const escaped_prefix = configs.bot.force_prefix.replace(/([.*+?^=!:${}()|[\]\/\\])/g, "\\$1");
         const reg = new RegExp(`^\\s*<@${configs.credentials.discord_bot.id}>\\s*${escaped_prefix}(.*)$`);
         const order = text.match(reg)[1].trim();
-        c.debug(order);
-        c.info("命令解析");
-        c.debug("命令:"+ order);
+        c.log(order, "debug");
+        c.log("命令解析", "info");
+        c.log("命令:"+ order, "debug");
         const [, command, type, target]  = order.match(/^(help|channel)?\s*(\+|-)?\s*(.*)?/i);
-        c.debug("command:" + command);
-        c.debug("type:" + type);
-        c.debug("target:" + target);
+        c.log("command:" + command, "debug");
+        c.log("type:" + type, "debug");
+        c.log("target:" + target, "debug");
         if (!command || command.toLowerCase() == "help") {
-            c.info("ヘルプ表示命令");
+            c.log("ヘルプ表示命令", "info");
             this.showHelp(); return;
         }
         switch (command.toLowerCase()) {
             case "channel":
-                c.info("チャンネル操作命令");
+                c.log("チャンネル操作命令", "info");
                 this.channelProcess.execute(type, target);
                 break;
             default:
@@ -55,7 +55,7 @@ class OrderExecutor
 
     showHelp()
     {
-        c.info("ヘルプ表示実行");
+        c.log("ヘルプ表示実行", "info");
         const helpMessage = fs.readFileSync('configs/order-help.txt', 'utf8');
         this.send("```" + helpMessage + "```");
     }

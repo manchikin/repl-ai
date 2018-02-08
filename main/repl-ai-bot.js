@@ -37,16 +37,16 @@ function start_repl_ai(message) {
             db.findOne({discord_id: replyeeId}, callback);
         },
         function(doc, callback) {
-            c.info("知り合い？");
-            c.debug(doc);
+            c.log("知り合い？", "info");
+            c.log(doc, "debug");
             if (!doc) {
-                c.info("知らない人");
+                c.log("知らない人", "info");
                 isInit = true;
                 lastTalkedAt = dateFormat(new Date(), "yyyy-mm-dd HH:MM:ss");
                 replAi.register(callback);
 
             } else {
-                c.info("知ってた");
+                c.log("知ってた", "info");
                 isInit = false;
                 talkTimeNumber = doc.talk_time_number;
                 const data = Object.assign({isInit: false}, doc);
@@ -56,20 +56,20 @@ function start_repl_ai(message) {
         },
         function (data, callback) {
             if (isInit) {
-                c.info("覚えた");
+                c.log("覚えた", "info");
                 db.insert(mm.initInsertDoc(replyeeId, data.appUserId), callback);
             } else {
                 callback(null, data);
             }
         },
         function (doc, callback) {
-            c.debug("こう聞かれた");
-            c.debug(":> " + text);
-            c.info("prefix反映作業開始");
+            c.log("こう聞かれた", "debug");
+            c.log(":> " + text, "debug");
+            c.log("prefix反映作業開始", "info");
             am = new AffixManager(doc);
             const prefix = am.getPrefix();
-            c.debug("prefix追加判定後文字列");
-            c.debug(":> " + prefix + text);
+            c.log("prefix追加判定後文字列", "debug");
+            c.log(":> " + prefix + text, "debug");
             const replOptions = {
                 appUserId: doc.app_user_id
                 , voiceText: prefix + text
@@ -77,16 +77,16 @@ function start_repl_ai(message) {
                 , appRecvTime: lastTalkedAt
             };
 
-            c.info("ダイアログ実行");
+            c.log("ダイアログ実行", "info");
             replAi.createDialogue(replOptions, callback);
         },
         function(data, callback) {
             response = data;
-            c.info('suffix取得処理')
+            c.log('suffix取得処理', "info")
             const suffix = am.getSuffixDataOf(response.systemText.expression);
-            c.debug("suffix:");
-            c.debug(suffix);
-            c.info("最後の会話日時を記憶する");
+            c.log("suffix:", "debug");
+            c.log(suffix, "debug");
+            c.log("最後の会話日時を記憶する", "info");
             db.update({discord_id: replyeeId},
                  {$set: {last_talked_at: new Date()
                        , talk_time_number: talkTimeNumber + 1
@@ -97,8 +97,8 @@ function start_repl_ai(message) {
             dm.outputDialogueLog(replyeeId, text, suffix.responseText, suffix.string, suffix.updateFavorability);
         },
         function () {
-            c.info("返答する");
-            c.debug(response.responseMessage);
+            c.log("返答する", "info");
+            c.log(response.responseMessage, "debug");
             message.channel.send(mm.replyeeString(replyeeId) + " " + response.responseMessage);
         }
     ],
