@@ -37,7 +37,7 @@ client.on("guildMemberAdd", (member) => {
 client.on("message", (message) => {
     async.waterfall([
         (callback) => {
-            if (!mm.isSentTo(configs.bot.id, message)) return;
+            if (!mm.isSentTo(configs.credentials.discord_bot.id, message)) return;
             c.info("メッセージ受付");
             if (mm.isOrder(message.content)) {
                 const orderExecutor = new OE(message);
@@ -58,7 +58,7 @@ client.on("message", (message) => {
     });
 });
 
-client.login(configs.bot.token);
+client.login(configs.credentials.discord_bot.token);
 
 
 

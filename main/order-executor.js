@@ -28,7 +28,7 @@ class OrderExecutor
         this.client = client;
         c.info("命令受付");
         const escaped_prefix = configs.bot.force_prefix.replace(/([.*+?^=!:${}()|[\]\/\\])/g, "\\$1");
-        const reg = new RegExp(`^\\s*<@${configs.bot.id}>\\s*${escaped_prefix}(.*)$`);
+        const reg = new RegExp(`^\\s*<@${configs.credentials.discord_bot.id}>\\s*${escaped_prefix}(.*)$`);
         const order = text.match(reg)[1].trim();
         c.debug(order);
         c.info("命令解析");

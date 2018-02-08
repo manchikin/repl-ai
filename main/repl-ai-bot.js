@@ -3,8 +3,8 @@ const MessageManager = require('../lib/message-manager');
 const mm = new MessageManager();
 const ReplAI = require('../lib/repl-ai');
 const replAiOptions = {
-      x_api_key: configs.repl_ai.x_api_key
-    , botId: configs.repl_ai.bot_id
+      x_api_key: configs.credentials.repl_ai.x_api_key
+    , botId: configs.credentials.repl_ai.bot_id
 };
 const replAi = new ReplAI(replAiOptions);
 const Datastore = require('nedb');
