@@ -9,3 +9,6 @@ output/*
 !output/.gitignore
 test/*
 !test/.gitignore
+configs/credentials/credential.json
+!configs/credentials/.gitignore
+
