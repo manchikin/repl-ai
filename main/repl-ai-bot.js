@@ -94,7 +94,7 @@ function start_repl_ai(message) {
                        , favorability: suffix.updateFavorability
                    }}, {}, callback)
             response.responseMessage = suffix.responseText;
-            dm.outputDialogueLog(replyeeId, text, suffix.responseText, suffix.string, suffix.updateFavorability);
+            dm.outputDialogueLog(replyeeId, text, suffix.responseText, suffix.suffixString, suffix.updateFavorability);
         },
         function () {
             c.log("返答する", "info");

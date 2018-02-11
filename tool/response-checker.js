@@ -1,6 +1,9 @@
 const AffixManager = require('../lib/repl-ai/affix-manager');
 const fs = require("fs");
-const response = fs.readFileSync('test/repl-ai/repl-ai-response.txt', 'utf8');
+
+const filename = process.argv[2] ? 'test/repl-ai/' + process.argv[2] : 'test/repl-ai/repl-ai-response.txt';
+
+const response = fs.readFileSync(filename, 'utf8');
 
 // console.log("response:", response);
 const last_suffix_data = response.split("###")[1];

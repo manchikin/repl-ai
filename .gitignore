@@ -7,8 +7,8 @@ configs/order-help.txt
 configs/configs.json
 output/*
 !output/.gitignore
-test/*
-!test/.gitignore
+test/repl-ai/*
+!test/repl-ai/.gitignore
 configs/credentials/credential.json
 !configs/credentials/.gitignore
 
