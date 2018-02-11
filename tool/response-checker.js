@@ -2,6 +2,7 @@ const AffixManager = require('../lib/repl-ai/affix-manager');
 const fs = require("fs");
 
 const filename = process.argv[2] ? 'test/repl-ai/' + process.argv[2] : 'test/repl-ai/repl-ai-response.txt';
+const favorability = process.argv[3];
 
 const response = fs.readFileSync(filename, 'utf8');
 
@@ -9,7 +10,7 @@ const response = fs.readFileSync(filename, 'utf8');
 const last_suffix_data = response.split("###")[1];
 console.log(last_suffix_data);
 const data = {
-    "favorability": 20
+    "favorability": favorability
     , "last_suffix_data": last_suffix_data
 };
 const af = new AffixManager(data);
