@@ -1,0 +1,10 @@
+***HELP***
+◆CHANNEL
+    ▼追加時
+        ! channel + [Channel ID]
+        ex. @Sala ! channel + 123456789
+    ▼削除時
+        ! channel -
+        ex. @Sala ! channel - 123456789
+    ▼一覧
+        ! channel

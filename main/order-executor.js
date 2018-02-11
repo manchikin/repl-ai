@@ -56,7 +56,7 @@ class OrderExecutor
     showHelp()
     {
         c.log("ヘルプ表示実行", "info");
-        const helpMessage = fs.readFileSync('configs/order-help.txt', 'utf8');
+        const helpMessage = fs.readFileSync('configs/messages/order-help.txt', 'utf8');
         this.send("```" + helpMessage + "```");
     }
 
