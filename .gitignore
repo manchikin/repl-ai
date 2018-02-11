@@ -3,6 +3,8 @@ node_modules*
 *.tsv
 *.db
 aaa.js
+configs/*
+!configs/bootload.js
 configs/order-help.txt
 configs/configs.json
 output/*
