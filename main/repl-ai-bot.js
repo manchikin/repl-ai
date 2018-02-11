@@ -26,6 +26,7 @@ function start_repl_ai(message) {
     let response = {}; // createDialogueにて返却されたデータ
     let lastTalkedAt;
     let talkTimeNumber = 0;
+    let isNameKnown = false;
     let am; //AffixManager
 
     const text = message.content.match(/(.*\d>|@everyone|@here)\s*(.*)$/)[2];
@@ -48,6 +49,11 @@ function start_repl_ai(message) {
 
             } else {
                 c.log("知ってた", "info");
+                console.log("doc", doc);
+                if (doc.remember_name) {
+                    c.log("名前登録済み", "info");
+                    isNameKnown = doc.remember_name;
+                }
                 isInit = false;
                 talkTimeNumber = doc.talk_time_number;
                 const data = Object.assign({isInit: false}, doc);
@@ -71,10 +77,11 @@ function start_repl_ai(message) {
             const prefix = am.getPrefix();
             c.log("prefix追加判定後文字列", "debug");
             c.log(":> " + prefix + text, "debug");
+            console.log("isNameKnown", isNameKnown);
             const replOptions = {
                 appUserId: doc.app_user_id
                 , voiceText: prefix + text
-                , initTopicId: configs.repl_ai.root_topic_id
+                , initTopicId: isNameKnown ? configs.repl_ai.topic_id.root : configs.repl_ai.topic_id.name
                 , appRecvTime: lastTalkedAt
             };
 
@@ -94,6 +101,7 @@ function start_repl_ai(message) {
                        , talk_time_number: talkTimeNumber + 1
                        , last_suffix_data: suffix.suffixString
                        , favorability: insertFavorability
+                       , remember_name: suffix.rememberName
                    }}, {}, callback)
             response.responseMessage = suffix.responseText;
             dm.outputDialogueLog(replyeeId, text, suffix.responseText, suffix.suffixString, insertFavorability);
