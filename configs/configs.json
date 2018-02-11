@@ -35,7 +35,11 @@
             }
 		}
         , "status": {
-            "first_favorability": 20
+            "favorability": {
+                "first_value": 50
+                , "max_value": 100
+                , "increment_per_talk": 1
+            }
         }
 	}
 }

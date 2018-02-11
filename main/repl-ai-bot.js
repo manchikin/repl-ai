@@ -16,6 +16,7 @@ const db = new Datastore({
     filename: configs.repl_ai.db.main.path
 });
 const AffixManager = require('../lib/repl-ai/affix-manager');
+const FavM = require('../lib/repl-ai/favorability-manager');
 
 const async = require("async");
 
@@ -87,14 +88,15 @@ function start_repl_ai(message) {
             c.log("suffix:", "debug");
             c.log(suffix, "debug");
             c.log("最後の会話日時を記憶する", "info");
+            const insertFavorability = suffix.updateFavorability + FavM.getPlusFavorabilityPerTalk(suffix.updateFavorability);
             db.update({discord_id: replyeeId},
                  {$set: {last_talked_at: new Date()
                        , talk_time_number: talkTimeNumber + 1
                        , last_suffix_data: suffix.suffixString
-                       , favorability: suffix.updateFavorability
+                       , favorability: insertFavorability
                    }}, {}, callback)
             response.responseMessage = suffix.responseText;
-            dm.outputDialogueLog(replyeeId, text, suffix.responseText, suffix.suffixString, suffix.updateFavorability);
+            dm.outputDialogueLog(replyeeId, text, suffix.responseText, suffix.suffixString, insertFavorability);
         },
         function () {
             c.log("返答する", "info");
