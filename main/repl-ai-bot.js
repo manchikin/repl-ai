@@ -6,6 +6,7 @@ const replAiOptions = {
       x_api_key: configs.credentials.repl_ai.x_api_key
     , botId: configs.credentials.repl_ai.bot_id
 };
+const MorphemeAnalyzer = require('./repl-ai/morpheme-analyze');
 const replAi = new ReplAI(replAiOptions);
 const Datastore = require('nedb');
 const c = require('../lib/console');
@@ -17,21 +18,30 @@ const db = new Datastore({
 });
 const AffixManager = require('../lib/repl-ai/affix-manager');
 const FavM = require('../lib/repl-ai/favorability-manager');
+const ReplAiMessage = require('./message/repl-ai-message');
 
 const async = require("async");
 
 function start_repl_ai(message) {
+    let replAiMessage;
     const replyeeId = message.author.id;
     let isInit = false;
     let response = {}; // createDialogueにて返却されたデータ
     let lastTalkedAt;
     let talkTimeNumber = 0;
     let isNameKnown = false;
+    let keepSameScenario = false;
     let am; //AffixManager
 
     const text = message.content.match(/(.*\d>|@everyone|@here)\s*(.*)$/)[2];
 
     async.waterfall([
+        function(callback) {
+            replAiMessage = new ReplAiMessage(message, callback);
+        },
+        function(callback) {
+            callback(null);
+        },
         function(callback) {
             db.loadDatabase(callback);
         },
@@ -49,20 +59,23 @@ function start_repl_ai(message) {
 
             } else {
                 c.log("知ってた", "info");
-                console.log("doc", doc);
                 if (doc.remember_name) {
                     c.log("名前登録済み", "info");
-                    isNameKnown = doc.remember_name;
+                    isNameKnown = true;
                 }
-                isInit = false;
+                if (doc.keepSameScenario) {
+                    c.log("以前のシナリオIDに遷移", "info");
+                    keepSameScenario = true;
+                }
                 talkTimeNumber = doc.talk_time_number;
-                const data = Object.assign({isInit: false}, doc);
                 lastTalkedAt = dateFormat(doc.last_talked_at, "yyyy-mm-dd HH:MM:ss");
-                callback(null, data);
+                callback(null, doc);
             }
         },
         function (data, callback) {
             if (isInit) {
+                c.log("replAi-response", "debug");
+                c.log(data, "debug");
                 c.log("覚えた", "info");
                 db.insert(mm.initInsertDoc(replyeeId, data.appUserId), callback);
             } else {
@@ -75,17 +88,32 @@ function start_repl_ai(message) {
             c.log("prefix反映作業開始", "info");
             am = new AffixManager(doc);
             const prefix = am.getPrefix();
+            const prefixText = prefix + text;
             c.log("prefix追加判定後文字列", "debug");
-            c.log(":> " + prefix + text, "debug");
-            console.log("isNameKnown", isNameKnown);
-            const replOptions = {
-                appUserId: doc.app_user_id
-                , voiceText: prefix + text
-                , initTopicId: isNameKnown ? configs.repl_ai.topic_id.root : configs.repl_ai.topic_id.name
-                , appRecvTime: lastTalkedAt
-            };
+            c.log(":> " + prefixText, "debug");
+
+            let replOptions = {
+                  appUserId   : doc.app_user_id
+                , appRecvTime : lastTalkedAt
+            }
+
+            if (isInit) {
+                replOptions.voiceText = text; // 実際には名前を聞くフローだけなので、別に設定しなくてもよい
+                replOptions.initTopicId = configs.repl_ai.topic_id.name;
+            } else if (!isNameKnown) {
+                replOptions.voiceText = prefixText;
+            } else {
+                if (keepSameScenario) {
+                    replOptions.voiceText = prefixText;
+                } else {
+                    const ma = new MorphemeAnalyzer(text);
+                    replOptions.voiceText = ma.getText();
+                    replOptions.initTopicId = configs.repl_ai.topic_id.root;
+                }
+            }
 
             c.log("ダイアログ実行", "info");
+            c.log(replOptions, "debug");
             replAi.createDialogue(replOptions, callback);
         },
         function(data, callback) {
@@ -109,7 +137,8 @@ function start_repl_ai(message) {
         function () {
             c.log("返答する", "info");
             c.log(response.responseMessage, "debug");
-            message.channel.send(mm.replyeeString(replyeeId) + " " + response.responseMessage);
+            console.log(message);
+            // message.channel.send(mm.replyeeString(replyeeId) + " " + response.responseMessage);
         }
     ],
     function(err, result){
